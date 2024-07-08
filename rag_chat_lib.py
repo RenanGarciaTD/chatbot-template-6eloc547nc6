@@ -1,4 +1,5 @@
 import os
+import streamlit as st
 from langchain.memory import ConversationBufferWindowMemory
 from langchain_openai import OpenAIEmbeddings
 from langchain.chains import ConversationalRetrievalChain
@@ -9,8 +10,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_openai import ChatOpenAI
 
-OPENAI_KEY = os.getenv("OPENAI_API_KEY")
-print(OPENAI_KEY)
+OPENAI_KEY = st.secrets["OPENAI_API_KEY"]
 
 
 def get_llm():
