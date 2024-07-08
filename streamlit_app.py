@@ -1,3 +1,5 @@
+import rag_chat_lib as glib
+
 import streamlit as st
 from openai import OpenAI
 
