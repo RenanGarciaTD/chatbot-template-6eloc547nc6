@@ -1,34 +1,38 @@
-import rag_chat_lib as glib
-
+import re
+from time import sleep
 import streamlit as st
-from openai import OpenAI
 
-st.set_page_config(page_title="RAG Chatbot") #HTML title
-st.title("RAG Chatbot") #page title
+st.title("Tais")
 
-if 'memory' not in st.session_state: #see if the memory hasn't been created yet
-    st.session_state.memory = glib.get_memory() #initialize the memory
+st.subheader("Tributo Devido")
 
-if 'chat_history' not in st.session_state:
-    st.session_state.chat_history = []
 
-if 'vector_index' not in st.session_state:
-    st.session_state.vector_index = glib.get_index() 
+def validar_email(email: str) -> bool:
+    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if re.match(regex, email):
+        return True
+    return False
 
-#Re-render the chat history (Streamlit re-runs this script, so need this to preserve previous chat messages)
-for message in st.session_state.chat_history: #loop through the chat history
-    with st.chat_message(message["role"]): #renders a chat line for the given role, containing everything in the with block
-        st.markdown(message["text"]) #display the chat content
+def validar_telefone(telefone: str) -> bool:
+    regex = r'^\+?[1-9]\d{1,14}$'
+    if re.match(regex, telefone):
+        return True
+    return False
 
-input_text = st.text_area("Input text", label_visibility="collapsed") #display a multiline text box with no label
-go_button = st.button("Go", type="primary") #display a primary button
-if go_button: #code in this if block will be run when the button is clicked
-    with st.chat_message("user"): #display a user chat message
-        st.markdown(input_text) #renders the user's latest message
+with st.form(key="form-login",clear_on_submit=True):
 
-    with st.spinner("Working..."): #show a spinner while the code in this with block runs
-        response_content = glib.get_rag_chat_response(input_text=input_text, memory=st.session_state.memory, index=st.session_state.vector_index) #call the model through the supporting library
+    email = st.text_input("Email")
+    telefone = st.text_input("Telefone")
 
-        st.write(response_content) #display the response content
-        st.session_state.chat_history.append({"role":"user", "text":input_text}) #append the user's latest message to the chat history
-        st.session_state.chat_history.append({"role":"assistant", "text":response_content}) #append the bot's latest message to the chat history
+    login_button = st.form_submit_button("Login")
+
+    if login_button:
+        if validar_email(email) and validar_telefone(telefone):
+            st.session_state['Email'] = email
+            st.session_state['Login'] = 'Logado'
+            st.success('Login realizado com sucesso!')
+            sleep(2)
+            st.switch_page('chat_app.py')
+            
+        else:
+            st.error("Favor verificar os dados.")
